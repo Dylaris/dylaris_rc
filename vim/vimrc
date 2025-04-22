@@ -1,0 +1,159 @@
+"==============================================
+" Basic Settings
+"==============================================
+let $LANG = 'en_US'                 " Set message language
+set langmenu=en_US                  " Set menu's language of gvim
+source $VIMRUNTIME/delmenu.vim
+source $VIMRUNTIME/menu.vim
+source $VIMRUNTIME/vimrc_example.vim
+
+cd D:/Vim/workspace                 " Switch to work space
+
+" Toggle Menu and Toolbar
+set guioptions-=m
+set guioptions-=T
+map <silent> <F2> :if &guioptions =~# 'T' <Bar>
+        \set guioptions-=T <Bar>
+        \set guioptions-=m <bar>
+    \else <Bar>
+        \set guioptions+=T <Bar>
+        \set guioptions+=m <Bar>
+    \endif<CR>
+
+filetype on                         " Enable filetype detection
+filetype indent on                  " Enable automatic indentation
+set nocompatible                    " Disable Vi compatibility mode
+
+set clipboard=unnamedplus           " Set default operand to system clipboard
+
+set tabstop=4                       " Number of spaces for a tab
+set softtabstop=4                   " 4 spaces are viewed as a tab
+set expandtab                       " Replace tab to spaces
+set smarttab                        " Identify tab when using backspace
+set shiftwidth=4                    " Number of spaces for autoindent
+
+set showmatch                       " Highlight matching parentheses
+set matchtime=4                     " Flash time of matching parenthese
+
+set autoindent                      " Enable auto indentation
+set cindent                         " Enable C-style indentation
+
+set nobackup                        " Do not auto generate backup file
+set noswapfile                      " Do not auto generate swap file
+set nowritebackup                   " Do not auto generate backup file when editing
+set noundofile                      " Do not auto generate file when undo
+
+set hls                             " Highlight search matches
+set ignorecase                      " Case insensitive search
+
+set relativenumber                  " Show relative line numbers
+set number                          " Show absolute line numbers
+set termguicolors                   " Enable true color support
+set laststatus=2                    " Always show status line
+set background=dark                 " Set background
+colorscheme zaibatsu                " Colorscheme
+
+set updatetime=300                  " Delay for CursorHold events
+set mouse=a                         " Enable mouse support
+
+" Format options for specific file types
+autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
+"==============================================
+
+"==============================================
+" Key Mappings
+"==============================================
+let mapleader = "\<Space>"           " Set leader key to Space
+
+"----------------------------------------------
+" Normal Mode Mappings
+"----------------------------------------------
+" Clear search highlights
+nnoremap <Leader>nh :nohls<CR>
+
+" Split window vertically
+nnoremap <Leader>sv <C-w>v
+" Split window horizontally
+nnoremap <Leader>sh <C-w>s
+" Make split windows equal size
+nnoremap <Leader>se <C-w>=
+" Close current split window
+nnoremap <Leader>sx :close<CR>
+
+" Open a new buffer (open a file)
+nnoremap <Leader>bo :e<Space>
+" Edit vimrc
+nnoremap <Leader>bv :e $MYVIMRC<CR>
+" Close current buffer
+nnoremap <Leader>x :bd<CR>
+" Go to next buffer
+nnoremap <A-n> :bnext<CR>
+" Go to previous buffer
+nnoremap <A-p> :bprev<CR>
+" Go to last buffer
+nnoremap <Leader>bl :blast<CR>
+" Go to first buffer
+nnoremap <Leader>bf :bfirst<CR>
+" Go to modified buffer
+nnoremap <Leader>bm :bmodified<CR>
+" Open current file in a new buffer
+nnoremap <Leader>bc :e %<CR>
+
+" Move to previous window
+nnoremap <A-h> <C-w>h
+" Move to next window
+nnoremap <A-l> <C-w>l
+" Move to previous window (up)
+nnoremap <A-j> <C-w>j
+" Move to next window (down)
+nnoremap <A-k> <C-w>k
+" Grow the size of current window
+nnoremap <A-=> <C-w>+
+" Down the size of current window
+nnoremap <A--> <C-w>-
+
+" Move to the first character of the line
+nnoremap <C-h> ^
+" Move to the end of the line
+nnoremap <C-l> $
+
+" Save file
+nnoremap <Leader>w :w<CR>
+" Exit file
+nnoremap <Leader>q :q<CR>
+
+" Insert a new line below
+nnoremap <C-j> o<Esc>
+" Insert a new line above
+nnoremap <C-k> O<Esc>
+" Break line at current position
+nnoremap <C-n> i<CR><Esc>
+
+nnoremap p ""p
+nnoremap y ""y
+noremap <Leader>p "+p
+noremap <Leader>y "+y
+
+"----------------------------------------------
+" Visual Mode Mappings
+"----------------------------------------------
+" Move to the first character of the line
+xnoremap <C-h> ^
+" Move to the exd of the line
+xnoremap <C-l> $
+
+"----------------------------------------------
+" Insert Mode Mappings
+"----------------------------------------------
+" Exit insert mode with 'jk'
+inoremap jk <Esc>
+
+"----------------------------------------------
+" Command Mode Mappings
+"----------------------------------------------
+command! Vterm execute 'vsp' | execute 'term' | wincmd
+
+"----------------------------------------------
+" Terminal Mode Mappings
+"----------------------------------------------
+tnoremap <Esc> <C-\><C-n>
