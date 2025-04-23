@@ -5,9 +5,11 @@ let $LANG = 'en_US'                 " Set message language
 set langmenu=en_US                  " Set menu's language of gvim
 source $VIMRUNTIME/delmenu.vim
 source $VIMRUNTIME/menu.vim
-source $VIMRUNTIME/vimrc_example.vim
 
-cd D:/Vim/workspace                 " Switch to work space
+let $VIM_WORKSPACE = 'D:/Vim/workspace'
+let $LINUX_HOME = '\\wsl.localhost\Ubuntu-22.04\home\dylaris'
+cd $VIM_WORKSPACE                   " Switch to work space
+set cdpath=,,;$LINUX_HOME
 
 " Toggle Menu and Toolbar
 set guioptions-=m
@@ -20,11 +22,14 @@ map <silent> <F2> :if &guioptions =~# 'T' <Bar>
         \set guioptions+=m <Bar>
     \endif<CR>
 
+syntax on
 filetype on                         " Enable filetype detection
 filetype indent on                  " Enable automatic indentation
 set nocompatible                    " Disable Vi compatibility mode
 
 set clipboard=unnamedplus           " Set default operand to system clipboard
+
+set complete+=d                     " Add auto complete of macro for c/c++
 
 set tabstop=4                       " Number of spaces for a tab
 set softtabstop=4                   " 4 spaces are viewed as a tab
@@ -46,12 +51,13 @@ set noundofile                      " Do not auto generate file when undo
 set hls                             " Highlight search matches
 set ignorecase                      " Case insensitive search
 
+set cursorline                      " Highlight cursor line
 set relativenumber                  " Show relative line numbers
 set number                          " Show absolute line numbers
 set termguicolors                   " Enable true color support
 set laststatus=2                    " Always show status line
 set background=dark                 " Set background
-colorscheme zaibatsu                " Colorscheme
+colorscheme distinguished           " Colorscheme
 
 set updatetime=300                  " Delay for CursorHold events
 set mouse=a                         " Enable mouse support
@@ -71,25 +77,33 @@ let mapleader = "\<Space>"           " Set leader key to Space
 " Clear search highlights
 nnoremap <Leader>nh :nohls<CR>
 
+" Open the directory tree in current window
+" nnoremap <Leader>ex :Explore<CR>
+" Open the directory tree in splited vertically window
+" nnoremap <Leader>vx :Vexplore<CR>
+
+" Open a terminal (horizontal)
+nnoremap <Leader>ht :term<Space>
+" Open a terminal (vertical)
+nnoremap <Leader>t :vert term<Space>
+
 " Split window vertically
 nnoremap <Leader>sv <C-w>v
 " Split window horizontally
 nnoremap <Leader>sh <C-w>s
-" Make split windows equal size
-nnoremap <Leader>se <C-w>=
-" Close current split window
-nnoremap <Leader>sx :close<CR>
 
 " Open a new buffer (open a file)
 nnoremap <Leader>bo :e<Space>
 " Edit vimrc
-nnoremap <Leader>bv :e $MYVIMRC<CR>
+nnoremap <Leader>br :e<Space>$MYVIMRC<CR>
 " Close current buffer
-nnoremap <Leader>x :bd<CR>
+nnoremap <Leader>bx :b#<bar>bd#<CR>
 " Go to next buffer
 nnoremap <A-n> :bnext<CR>
 " Go to previous buffer
 nnoremap <A-p> :bprev<CR>
+" Go to last visited buffer
+nnoremap <Leader>bv :b#<CR>
 " Go to last buffer
 nnoremap <Leader>bl :blast<CR>
 " Go to first buffer
@@ -97,7 +111,7 @@ nnoremap <Leader>bf :bfirst<CR>
 " Go to modified buffer
 nnoremap <Leader>bm :bmodified<CR>
 " Open current file in a new buffer
-nnoremap <Leader>bc :e %<CR>
+nnoremap <Leader>bc :e<Space>%<CR>
 
 " Move to previous window
 nnoremap <A-h> <C-w>h
@@ -107,10 +121,17 @@ nnoremap <A-l> <C-w>l
 nnoremap <A-j> <C-w>j
 " Move to next window (down)
 nnoremap <A-k> <C-w>k
-" Grow the size of current window
-nnoremap <A-=> <C-w>+
-" Down the size of current window
-nnoremap <A--> <C-w>-
+
+" Grow the size of current window (vertical)
+nnoremap <C-Up> <C-w>+
+" Down the size of current window (vertical)
+nnoremap <C-Down> <C-w>-
+" Grow the size of current window (horizontal)
+nnoremap <C-Right> <C-w>>
+" Down the size of current window (horizontal)
+nnoremap <C-Left> <C-w><
+" Equal the size of current window
+nnoremap <C-e> <C-w>=
 
 " Move to the first character of the line
 nnoremap <C-h> ^
@@ -151,9 +172,16 @@ inoremap jk <Esc>
 "----------------------------------------------
 " Command Mode Mappings
 "----------------------------------------------
-command! Vterm execute 'vsp' | execute 'term' | wincmd
 
 "----------------------------------------------
 " Terminal Mode Mappings
 "----------------------------------------------
 tnoremap <Esc> <C-\><C-n>
+
+"==============================================
+" Plug Configuration
+"==============================================
+
+"----------------------------------------------
+" Netrw
+"----------------------------------------------
