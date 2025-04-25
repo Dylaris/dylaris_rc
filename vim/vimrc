@@ -1,4 +1,12 @@
 "==============================================
+" Plugin Configuration
+"==============================================
+call plug#begin('$VIM/vimfiles/plugged')
+    Plug 'itchyny/lightline.vim'    " Lightweight status line
+    Plug 'preservim/nerdtree'       " File tree
+call plug#end()
+
+"==============================================
 " Basic Settings
 "==============================================
 let $LANG = 'en_US'                 " Set message language
@@ -31,6 +39,11 @@ set clipboard=unnamedplus           " Set default operand to system clipboard
 
 set complete+=d                     " Add auto complete of macro for c/c++
 
+set shell=powershell.exe
+set shellcmdflag=/c
+set shellquote=\"
+set shellxquote=
+
 set tabstop=4                       " Number of spaces for a tab
 set softtabstop=4                   " 4 spaces are viewed as a tab
 set expandtab                       " Replace tab to spaces
@@ -52,6 +65,7 @@ set hls                             " Highlight search matches
 set ignorecase                      " Case insensitive search
 
 set cursorline                      " Highlight cursor line
+
 set relativenumber                  " Show relative line numbers
 set number                          " Show absolute line numbers
 set termguicolors                   " Enable true color support
@@ -61,6 +75,8 @@ colorscheme distinguished           " Colorscheme
 
 set updatetime=300                  " Delay for CursorHold events
 set mouse=a                         " Enable mouse support
+
+set noshowmode                      " Use lightline status bar
 
 " Format options for specific file types
 autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
@@ -77,41 +93,37 @@ let mapleader = "\<Space>"           " Set leader key to Space
 " Clear search highlights
 nnoremap <Leader>nh :nohls<CR>
 
-" Open the directory tree in current window
-" nnoremap <Leader>ex :Explore<CR>
-" Open the directory tree in splited vertically window
-" nnoremap <Leader>vx :Vexplore<CR>
-
 " Open a terminal (horizontal)
-nnoremap <Leader>ht :term<Space>
+nnoremap <Leader>t :term<Space>
 " Open a terminal (vertical)
-nnoremap <Leader>t :vert term<Space>
+nnoremap <Leader>vt :vert term<Space>
 
 " Split window vertically
 nnoremap <Leader>sv <C-w>v
 " Split window horizontally
 nnoremap <Leader>sh <C-w>s
 
-" Open a new buffer (open a file)
-nnoremap <Leader>bo :e<Space>
 " Edit vimrc
-nnoremap <Leader>br :e<Space>$MYVIMRC<CR>
+nnoremap <Leader>br :e!<Space>$MYVIMRC<CR>
 " Close current buffer
-nnoremap <Leader>bx :b#<bar>bd#<CR>
-" Go to next buffer
-nnoremap <A-n> :bnext<CR>
-" Go to previous buffer
-nnoremap <A-p> :bprev<CR>
+nnoremap <Leader>bx :bd!<CR>
 " Go to last visited buffer
-nnoremap <Leader>bv :b#<CR>
-" Go to last buffer
-nnoremap <Leader>bl :blast<CR>
-" Go to first buffer
-nnoremap <Leader>bf :bfirst<CR>
+nnoremap <Leader>bv :b!<Space>#<CR>
+" Switch to other buffer
+nnoremap <Leader>bs :ls<CR>:b!<Space>
 " Go to modified buffer
-nnoremap <Leader>bm :bmodified<CR>
-" Open current file in a new buffer
-nnoremap <Leader>bc :e<Space>%<CR>
+nnoremap <Leader>bm :bmodified!<CR>
+
+" " Open new tab
+" nnoremap <leader>to :tabnew<CR>"
+" " Close current tab
+" nnoremap <leader>tx :tabclose<CR>"
+" " Go to next tab
+" nnoremap <Tab> :tabn<CR>"
+" " Go to previous tab
+" nnoremap <S-Tab> :tabp<CR>"
+" " Open current buffer in new tab
+" nnoremap <leader>tf :tabnew<Space>%<CR>"
 
 " Move to previous window
 nnoremap <A-h> <C-w>h
@@ -131,13 +143,15 @@ nnoremap <C-Right> <C-w>>
 " Down the size of current window (horizontal)
 nnoremap <C-Left> <C-w><
 " Equal the size of current window
-nnoremap <C-e> <C-w>=
+nnoremap <C-=> <C-w>=
 
 " Move to the first character of the line
 nnoremap <C-h> ^
 " Move to the end of the line
 nnoremap <C-l> $
 
+" Abort file
+nnoremap <Leader>e :q!<CR>
 " Save file
 nnoremap <Leader>w :w<CR>
 " Exit file
@@ -150,10 +164,19 @@ nnoremap <C-k> O<Esc>
 " Break line at current position
 nnoremap <C-n> i<CR><Esc>
 
+" Delete line content before cursor
+nnoremap du d^
+
 nnoremap p ""p
 nnoremap y ""y
 noremap <Leader>p "+p
 noremap <Leader>y "+y
+
+" nerdtree
+nnoremap ;n :NERDTreeFocus<CR>
+nnoremap ;m :NERDTree<CR>
+nnoremap ;t :NERDTreeToggle .<CR>
+nnoremap ;f :NERDTreeFind<CR>
 
 "----------------------------------------------
 " Visual Mode Mappings
@@ -172,16 +195,51 @@ inoremap jk <Esc>
 "----------------------------------------------
 " Command Mode Mappings
 "----------------------------------------------
+" Escape command mode
+cnoremap jj <C-c>
+" Send current input
+cnoremap jk <Esc>
 
 "----------------------------------------------
 " Terminal Mode Mappings
 "----------------------------------------------
-tnoremap <Esc> <C-\><C-n>
+tnoremap jk <C-\><C-n>
+
+"----------------------------------------------
+" All Mode Mappings
+"----------------------------------------------
+noremap <A-r> <C-r>
+noremap! <A-r> <C-r>
 
 "==============================================
 " Plug Configuration
 "==============================================
 
 "----------------------------------------------
-" Netrw
+" lightline
+"----------------------------------------------
+let g:lightline = {
+      \ 'colorscheme': 'PaperColor',
+      \ 'active': {
+      \   'right': [ [ 'lineinfo' ],
+      \              [ 'percent' ],
+      \              [ 'fileformat', 'fileencoding', 'filetype', 'charvaluehex' ] ],
+      \   'left': [ [ 'mode', 'paste' ],
+      \             [ 'readonly', 'filename', 'modified', 'helloworld' ] ]
+      \ },
+      \ 'component': {
+      \   'charvaluehex': '0x%B',
+      \   'helloworld': 'Hello, world!'
+      \ },
+      \ }
+
+"----------------------------------------------
+" netrw
+"----------------------------------------------
+let g:netrw_altv = 1        " Display the netrw to left when spliting vertically
+let g:netrw_alto = 1        " Display the netrw to left when spliting horizontally
+let g:netrw_winsize = 75    " Set the size of window where netrw lies to 25% (1 - 75%)
+
+"----------------------------------------------
+" nerdtree
 "----------------------------------------------
