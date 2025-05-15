@@ -2,10 +2,13 @@
 " Plugin Configuration
 "==============================================
 call plug#begin('$VIM/vimfiles/plugged')
-    Plug 'itchyny/lightline.vim'        " Lightweight status line
-    Plug 'preservim/nerdtree'           " File tree
-    " Plug 'sheerun/vim-polyglot'         " Syntax highlight
-    " Plug 'luochen1990/rainbow'          " Parenthesis highlight
+    Plug 'itchyny/lightline.vim'
+    Plug 'preservim/nerdtree'
+    Plug 'sheerun/vim-polyglot'
+    Plug 'luochen1990/rainbow'
+    Plug 'qpkorr/vim-bufkill'
+    Plug 'skywind3000/vim-terminal-help'
+    Plug 'sainnhe/sonokai'
 call plug#end()
 
 "==============================================
@@ -32,17 +35,17 @@ map <silent> <F2> :if &guioptions =~# 'T' <Bar>
         \set guioptions+=m <Bar>
     \endif<CR>
 
+set nocompatible                    " Disable Vi compatibility mode
+
 syntax on
 filetype on                         " Enable filetype detection
 filetype indent on                  " Enable automatic indentation
-set nocompatible                    " Disable Vi compatibility mode
+set fileformats=unix,dos            " unix use CR(\n) as newline character, dos use CRLF(\r\n)
+
+set columns=110                     " The initial window column size 
+set lines=35                        " The initial window row size
 
 set background=dark
-
-if has("termguicolors")
-  set t_SI=<Esc>[4m                 " Set the cursor to underline when entering insert mode
-  set t_EI=<Esc>[0m                 " Restore the default cursor when leaving insert mode
-endif
 
 set clipboard=unnamedplus           " Set default operand to system clipboard
 
@@ -66,7 +69,8 @@ set nowritebackup                   " Do not auto generate backup file when edit
 set noundofile                      " Do not auto generate file when undo
 
 set hls                             " Highlight search matches
-set ignorecase                      " Case insensitive search
+" set ignorecase                      " Case insensitive search
+set noignorecase                    " Case sensitive search
 
 set cursorline                      " Highlight cursor line
 
@@ -74,8 +78,6 @@ set relativenumber                  " Show relative line numbers
 set number                          " Show absolute line numbers
 set termguicolors                   " Enable true color support
 set laststatus=2                    " Always show status line
-" colorscheme distinguished           " Colorscheme
-colorscheme paramount               " Colorscheme
 
 set updatetime=300                  " Delay for CursorHold events
 set mouse=a                         " Enable mouse support
@@ -88,6 +90,71 @@ set noshowmode                      " Use lightline status bar
 
 " Format options for specific file types
 autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
+
+" Set fasm assembler syntax as default
+autocmd BufReadPre *.asm let g:asmsyntax = "fasm"
+
+" Reverse the order of selected lines
+function! ReverseLines()
+    let lines = getline("'<", "'>")
+    call setline("'<", reverse(lines))
+endfunction
+ 
+" Insert copyright
+command! -nargs=1 InsertCopyright call InsertCopyrightFunc(<f-args>)
+
+function! InsertCopyrightFunc(style)
+    let author = "Dylaris"
+    let license = "MIT"
+    let date = strftime('%Y-%m-%d')
+    let year = strftime('%Y')
+
+    if a:style == 'c'
+        execute 'normal! i' . '/*' . "\n"
+        execute 'normal! 0'
+
+        execute 'normal! i' . ' * Author: ' . author . "\n"
+        execute 'normal! 0'
+
+        execute 'normal! i' . ' * Copyright (c) ' . year . "\n"
+        execute 'normal! 0'
+
+        execute 'normal! i' . ' * License: ' . license . "\n"
+        execute 'normal! 0'
+
+        execute 'normal! i' . ' * Date: ' . date . "\n"
+        execute 'normal! 0'
+
+        execute 'normal! i' . ' *' . "\n"
+        execute 'normal! 0'
+
+        execute 'normal! i' . ' * All rights reserved' . "\n"
+        execute 'normal! 0'
+
+        execute 'normal! i' . ' */' . "\n"
+        execute 'normal! 0'
+    elseif a:style == 'lua'
+        execute 'normal! i' . '-- ' . 'Author: ' . author . "\n"
+        execute 'normal! 0'
+
+        execute 'normal! i' . '-- ' . 'Copyright (c) ' . year . "\n"
+        execute 'normal! 0'
+
+        execute 'normal! i' . '-- ' . 'License: ' . license . "\n"
+        execute 'normal! 0'
+
+        execute 'normal! i' . '-- ' . 'Date: ' . date . "\n"
+        execute 'normal! 0'
+
+        execute 'normal! i' . '--' . "\n"
+        execute 'normal! 0'
+
+        execute 'normal! i' . '-- All rights reserved' . "\n"
+        execute 'normal! 0'
+    else
+        echo "Invalid style. Use 'c' for C-style or 'lua' for Lua-style comments."
+    endif
+endfunction
 
 "==============================================
 " Key Mappings
@@ -110,16 +177,22 @@ nnoremap <Leader>sv <C-w>v
 " Split window horizontally
 nnoremap <Leader>sh <C-w>s
 
+" Open/Close terminal buffer
+nnoremap <Leader>bt :call TerminalToggle()<CR>
 " Edit vimrc
 nnoremap <Leader>br :e!<Space>$MYVIMRC<CR>
 " Close current buffer
-nnoremap <Leader>bx :bd!<CR>
+nnoremap <Leader>bd :BD!<CR>
 " Go to last visited buffer
 nnoremap <Leader>bv :b!<Space>#<CR>
 " Switch to other buffer
 nnoremap <Leader>bs :ls<CR>:b!<Space>
 " Go to modified buffer
 nnoremap <Leader>bm :bmodified!<CR>
+" Move backwards through recently accessed buffers
+nnoremap <Leader>bb :BB<CR>
+" Move forwards through recently accessed buffers
+nnoremap <Leader>bf :BF<CR>
 
 " " Open new tab
 " nnoremap <leader>to :tabnew<CR>"
@@ -192,6 +265,8 @@ nnoremap ;f :NERDTreeFind<CR>
 xnoremap <C-h> ^
 " Move to the exd of the line
 xnoremap <C-l> $
+" Find the selected text
+xnoremap <Leader>f y/<C-r>"
 
 "----------------------------------------------
 " Insert Mode Mappings
@@ -211,6 +286,8 @@ cnoremap jk <Esc>
 " Terminal Mode Mappings
 "----------------------------------------------
 tnoremap jk <C-\><C-n>
+tnoremap <A-r> <C-W>"
+tnoremap <A-p> <C-W>""
 
 "----------------------------------------------
 " All Mode Mappings
@@ -226,7 +303,7 @@ noremap! <A-r> <C-r>
 " lightline
 "----------------------------------------------
 let g:lightline = {
-      \ 'colorscheme': 'PaperColor',
+      \ 'colorscheme': 'sonokai',
       \ 'active': {
       \   'right': [ [ 'lineinfo' ],
       \              [ 'percent' ],
@@ -259,3 +336,56 @@ let g:rainbow_conf = {
     \   'operators': ''
     \}
 let g:rainbow_active = 1    "set to 0 if you want to enable it later via :RainbowToggle
+
+"----------------------------------------------
+" jellybeans
+"----------------------------------------------
+let g:jellybeans_use_gui_italics = 0
+" colorscheme jellybeans              " Colorscheme
+
+"----------------------------------------------
+" ayu
+"----------------------------------------------
+" let ayucolor="light"
+" let ayucolor="mirage"
+let ayucolor="dark"
+" colorscheme ayu                     " Colorscheme
+
+"----------------------------------------------
+" vim-bufkill
+"----------------------------------------------
+" Unloading a file from the buffer while keeping the window/split intact "      :BUN
+" Deleting a file from the buffer while keeping the window/split intact "       :BD
+" Wiping a file from the buffer while keeping the window/split intact "         :BW
+" Move backwards through recently accessed buffers "                            :BB
+" Move forwards through recently accessed buffers "                             :BF
+" Move to an alternate buffer and keep the cursor in the same column "          :BA
+
+"----------------------------------------------
+" vim-terminal-help
+"----------------------------------------------
+let g:terminal_cwd=2
+let g:terminal_shell="wsl"
+let g:terminal_height=15
+" ALT + =: toggle terminal below.
+" ALT + -: paste register 0 to terminal.
+
+"----------------------------------------------
+" sonokai
+"----------------------------------------------
+if has('termguicolors')
+  set termguicolors
+endif
+
+" let g:sonokai_style = 'default'
+" let g:sonokai_style = 'atlantis'
+let g:sonokai_style = 'andromeda'
+" let g:sonokai_style = 'shusia'
+" let g:sonokai_style = 'maia'
+" let g:sonokai_style = 'espresso'
+let g:sonokai_better_performance = 1
+let g:sonokai_disable_italic_comment = 1
+let g:sonokai_enable_italic = 0
+let g:sonokai_lightline_disable_bold = 1
+
+colorscheme sonokai
